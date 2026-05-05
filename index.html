@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>THCa Myth or Fact</title>
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+ 
+body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: #ffffff;
+  color: #1B3A2F;
+}
+ 
+.wrap {
+  max-width: 540px;
+  margin: 0 auto;
+  padding: 32px 24px 40px;
+}
+ 
+/* ── Progress ── */
+.progress-track {
+  height: 5px;
+  background: #e5ede9;
+  border-radius: 99px;
+  margin-bottom: 32px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: #1B3A2F;
+  border-radius: 99px;
+  transition: width 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 0%;
+}
+ 
+/* ── Intro ── */
+.screen-intro {
+  text-align: center;
+  padding: 8px 0 4px;
+}
+.intro-leaf {
+  font-size: 2.6rem;
+  line-height: 1;
+  margin-bottom: 20px;
+  display: block;
+}
+.intro-eyebrow {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #6b9e80;
+  margin-bottom: 10px;
+}
+.intro-heading {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #1B3A2F;
+  line-height: 1.2;
+  margin-bottom: 14px;
+}
+.intro-body {
+  font-size: 0.95rem;
+  color: #4a6b5a;
+  line-height: 1.7;
+  margin-bottom: 32px;
+  max-width: 380px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.btn-start {
+  display: inline-block;
+  padding: 15px 44px;
+  background: #1B3A2F;
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 0.97rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: background 0.18s ease, transform 0.14s ease, box-shadow 0.18s ease;
+  box-shadow: 0 4px 14px rgba(27, 58, 47, 0.22);
+}
+.btn-start:hover {
+  background: #2a5740;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(27, 58, 47, 0.3);
+}
+.btn-start:active {
+  transform: translateY(0);
+}
+ 
+/* ── Question screen ── */
+.q-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.q-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #6b9e80;
+}
+.q-counter {
+  font-size: 11px;
+  font-weight: 600;
+  color: #9ab5a8;
+}
+.q-statement {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1B3A2F;
+  line-height: 1.38;
+  margin-bottom: 28px;
+  min-height: 68px;
+}
+.q-statement em {
+  font-style: normal;
+  color: #3d7a5c;
+}
+ 
+/* ── Choice buttons ── */
+.choice-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.btn-choice {
+  padding: 18px 10px;
+  background: #ffffff;
+  border: 2px solid #c5ddd3;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #1B3A2F;
+  cursor: pointer;
+  transition: background 0.16s, border-color 0.16s, color 0.16s, transform 0.12s;
+  letter-spacing: 0.02em;
+}
+.btn-choice:hover:not(:disabled) {
+  background: #1B3A2F;
+  border-color: #1B3A2F;
+  color: #ffffff;
+  transform: translateY(-2px);
+}
+.btn-choice:active:not(:disabled) {
+  transform: translateY(0);
+}
+.btn-choice:disabled {
+  cursor: default;
+}
+.btn-choice.state-correct {
+  background: #d4ede0;
+  border-color: #4e9e72;
+  color: #1B3A2F;
+}
+.btn-choice.state-wrong {
+  background: #f2d9d9;
+  border-color: #c47a7a;
+  color: #6b1f1f;
+}
+.btn-choice.state-idle-disabled {
+  opacity: 0.38;
+}
+ 
+/* ── Reveal box ── */
+.reveal-box {
+  border-radius: 12px;
+  padding: 16px 18px;
+  margin-bottom: 20px;
+  display: none;
+  animation: riseIn 0.28s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.reveal-box.show { display: block; }
+.reveal-box.is-correct {
+  background: #eaf6f0;
+  border-left: 4px solid #4e9e72;
+}
+.reveal-box.is-wrong {
+  background: #fdf0f0;
+  border-left: 4px solid #c47a7a;
+}
+.reveal-verdict {
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 7px;
+}
+.reveal-box.is-correct .reveal-verdict { color: #2d7a52; }
+.reveal-box.is-wrong .reveal-verdict { color: #8b2c2c; }
+.reveal-explanation {
+  font-size: 0.92rem;
+  line-height: 1.68;
+  color: #2e4840;
+}
+ 
+/* ── Next button ── */
+.btn-next {
+  width: 100%;
+  padding: 15px;
+  background: #1B3A2F;
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 0.97rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: none;
+  transition: background 0.18s, transform 0.14s, box-shadow 0.18s;
+  box-shadow: 0 4px 14px rgba(27, 58, 47, 0.2);
+}
+.btn-next.show { display: block; }
+.btn-next:hover {
+  background: #2a5740;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(27, 58, 47, 0.28);
+}
+ 
+/* ── Result screen ── */
+.screen-result { text-align: center; padding: 4px 0; }
+.score-ring {
+  width: 92px;
+  height: 92px;
+  border-radius: 50%;
+  background: #1B3A2F;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.7rem;
+  font-weight: 800;
+  margin: 0 auto 22px;
+  box-shadow: 0 6px 22px rgba(27, 58, 47, 0.28);
+}
+.result-heading {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #1B3A2F;
+  margin-bottom: 12px;
+}
+.result-body {
+  font-size: 0.94rem;
+  color: #4a6b5a;
+  line-height: 1.7;
+  margin-bottom: 28px;
+  max-width: 360px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.btn-cta {
+  display: inline-block;
+  padding: 15px 32px;
+  background: #1B3A2F;
+  color: #ffffff;
+  text-decoration: none;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.18s, transform 0.14s, box-shadow 0.18s;
+  box-shadow: 0 4px 14px rgba(27, 58, 47, 0.22);
+  margin-bottom: 14px;
+}
+.btn-cta:hover {
+  background: #2a5740;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(27, 58, 47, 0.3);
+}
+.btn-replay {
+  display: block;
+  margin: 0 auto;
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #6b9e80;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.btn-replay:hover { color: #1B3A2F; }
+ 
+/* ── Animation ── */
+@keyframes riseIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+</style>
+</head>
+<body>
+ 
+<div class="wrap" id="root"></div>
+ 
+<script>
+(function () {
+ 
+  var QUESTIONS = [
+    {
+      statement: "Raw, unsmoked THCa produces an intoxicating effect on its own.",
+      answer: "myth",
+      explanation: "Raw THCa doesn't produce intoxicating effects before heat is applied — that's why you'll see it described as non-intoxicating on a lot of product pages. It's a technically accurate label for the raw compound. Once you smoke it, though, the effects are dramatically amplified."
+    },
+    {
+      statement: "A THCa blunt qualifies as federally legal hemp before it's lit.",
+      answer: "fact",
+      explanation: "Under the 2018 Farm Bill, hemp is defined by its Delta-9 THC content — not THCa. A blunt with Delta-9 below 0.3% by dry weight qualifies as legal hemp pre-combustion, which is exactly why brands can sell and ship it without a dispensary license."
+    },
+    {
+      statement: "Because THCa blunts are federally legal, they won't show up on a standard drug test.",
+      answer: "myth",
+      explanation: "A smoked THCa blunt will trigger a standard urine test. When smoked, the body produces THC-COOH — the metabolite drug screens are designed to detect. Federal legal status and what a drug test detects are two completely separate questions."
+    },
+    {
+      statement: "Reputable THCa blunts are rolled in hemp or botanical wraps — no tobacco.",
+      answer: "fact",
+      explanation: "Quality THCa blunts use hemp leaf or botanical wraps, which means no tobacco and no nicotine. Not every brand is upfront about wrap material on their product pages, so it's always worth checking before you commit."
+    }
+  ];
+ 
+  var OUTCOMES = [
+    {
+      range: [0, 1],
+      heading: "Room to grow. 🌱",
+      body: "THCa blunts come with a learning curve. The article above covers everything you need before you buy — worth a full read."
+    },
+    {
+      range: [2, 2],
+      heading: "Getting there.",
+      body: "You've got the core ideas down. A couple of things caught you out — check the article for the full picture before your next buy."
+    },
+    {
+      range: [3, 3],
+      heading: "Sharp. Really sharp.",
+      body: "Three out of four — you clearly know your THCa. The one that got you is covered in the article above if you want to lock it in."
+    },
+    {
+      range: [4, 4],
+      heading: "Perfect score. 🌿",
+      body: "Four for four. You walked in already knowing the stuff that matters. The Traditional Blunt is ready when you are."
+    }
+  ];
+ 
+  var state = { screen: 'intro', current: 0, score: 0, answered: false };
+  var root = document.getElementById('root');
+ 
+  function render() {
+    if (state.screen === 'intro')    { renderIntro(); }
+    else if (state.screen === 'quiz')   { renderQuestion(); }
+    else if (state.screen === 'result') { renderResult(); }
+    notifyResize();
+  }
+ 
+  /* ── Intro ── */
+  function renderIntro() {
+    root.innerHTML =
+      '<div class="screen-intro">' +
+        '<span class="intro-leaf">🌿</span>' +
+        '<div class="intro-eyebrow">Quick Quiz</div>' +
+        '<div class="intro-heading">THCa Myth or Fact?</div>' +
+        '<div class="intro-body">Four statements. You decide which are true. No tricks — just the stuff worth knowing before you buy.</div>' +
+        '<button class="btn-start" id="btnStart">Let\'s Go</button>' +
+      '</div>';
+    document.getElementById('btnStart').onclick = function () {
+      state.screen = 'quiz';
+      state.current = 0;
+      state.score = 0;
+      state.answered = false;
+      render();
+    };
+  }
+ 
+  /* ── Question ── */
+  function renderQuestion() {
+    state.answered = false;
+    var q = QUESTIONS[state.current];
+    var pct = Math.round((state.current / QUESTIONS.length) * 100);
+    var isLast = state.current === QUESTIONS.length - 1;
+ 
+    root.innerHTML =
+      '<div class="progress-track"><div class="progress-fill" id="pFill"></div></div>' +
+      '<div class="q-meta">' +
+        '<span class="q-label">Myth or Fact?</span>' +
+        '<span class="q-counter">' + (state.current + 1) + ' / ' + QUESTIONS.length + '</span>' +
+      '</div>' +
+      '<div class="q-statement">' + q.statement + '</div>' +
+      '<div class="choice-row">' +
+        '<button class="btn-choice" id="btnMyth">Myth</button>' +
+        '<button class="btn-choice" id="btnFact">Fact</button>' +
+      '</div>' +
+      '<div class="reveal-box" id="revealBox">' +
+        '<div class="reveal-verdict" id="revealVerdict"></div>' +
+        '<div class="reveal-explanation" id="revealExp"></div>' +
+      '</div>' +
+      '<button class="btn-next" id="btnNext">' + (isLast ? 'See My Results' : 'Next Question →') + '</button>';
+ 
+    setTimeout(function () {
+      var fill = document.getElementById('pFill');
+      if (fill) fill.style.width = pct + '%';
+    }, 30);
+ 
+    document.getElementById('btnMyth').onclick = function () { check('myth'); };
+    document.getElementById('btnFact').onclick = function () { check('fact'); };
+    document.getElementById('btnNext').onclick = function () {
+      state.current++;
+      if (state.current < QUESTIONS.length) {
+        render();
+      } else {
+        state.screen = 'result';
+        render();
+      }
+    };
+  }
+ 
+  function check(chosen) {
+    if (state.answered) return;
+    state.answered = true;
+ 
+    var q = QUESTIONS[state.current];
+    var correct = chosen === q.answer;
+    if (correct) state.score++;
+ 
+    var btnMyth   = document.getElementById('btnMyth');
+    var btnFact   = document.getElementById('btnFact');
+    var revealBox = document.getElementById('revealBox');
+    var verdict   = document.getElementById('revealVerdict');
+    var exp       = document.getElementById('revealExp');
+    var btnNext   = document.getElementById('btnNext');
+ 
+    btnMyth.disabled = true;
+    btnFact.disabled = true;
+ 
+    var chosenBtn  = chosen === 'myth' ? btnMyth : btnFact;
+    var otherBtn   = chosen === 'myth' ? btnFact  : btnMyth;
+    var correctBtn = q.answer === 'myth' ? btnMyth : btnFact;
+ 
+    chosenBtn.classList.add(correct ? 'state-correct' : 'state-wrong');
+    if (!correct) {
+      correctBtn.classList.add('state-correct');
+      otherBtn.classList.add('state-idle-disabled');
+    } else {
+      otherBtn.classList.add('state-idle-disabled');
+    }
+ 
+    verdict.textContent   = correct ? '✓ Correct' : '✗ Not quite';
+    exp.textContent       = q.explanation;
+    revealBox.classList.add('show');
+    revealBox.classList.add(correct ? 'is-correct' : 'is-wrong');
+    btnNext.classList.add('show');
+ 
+    notifyResize();
+  }
+ 
+  /* ── Result ── */
+  function renderResult() {
+    var outcome = OUTCOMES[0];
+    for (var i = 0; i < OUTCOMES.length; i++) {
+      if (state.score >= OUTCOMES[i].range[0] && state.score <= OUTCOMES[i].range[1]) {
+        outcome = OUTCOMES[i];
+        break;
+      }
+    }
+ 
+    root.innerHTML =
+      '<div class="progress-track"><div class="progress-fill" style="width:100%"></div></div>' +
+      '<div class="screen-result">' +
+        '<div class="score-ring">' + state.score + '/4</div>' +
+        '<div class="result-heading">' + outcome.heading + '</div>' +
+        '<div class="result-body">' + outcome.body + '</div>' +
+        '<a class="btn-cta" href="https://mood.com/product/traditional-blunt" target="_blank" rel="noopener">Shop the 2g Traditional Blunt — $26</a>' +
+        '<button class="btn-replay" id="btnReplay">Play again</button>' +
+      '</div>';
+ 
+    document.getElementById('btnReplay').onclick = function () {
+      state.screen = 'intro';
+      render();
+    };
+  }
+ 
+  /* ── iFrame resize helper ── */
+  function notifyResize() {
+    setTimeout(function () {
+      try {
+        var h = document.body.scrollHeight;
+        window.parent.postMessage({ type: 'iframeResize', height: h }, '*');
+      } catch (e) {}
+    }, 60);
+  }
+ 
+  render();
+ 
+})();
+</script>
+ 
+</body>
+</html>
